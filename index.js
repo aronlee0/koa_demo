@@ -46,30 +46,30 @@ var readline = require('readline');
 //     console.log('Got Error: ${e.massage}');
 // });
 
-const STATIC_RESOURCE_FILE = './fileconf/staticResource.properties';
-const STATIC_RESOURCE_CONFIG_FILE = './fileconf/staticResourceConfig.properties';
+// const STATIC_RESOURCE_FILE = './fileconf/staticResource.properties';
+// const STATIC_RESOURCE_CONFIG_FILE = './fileconf/staticResourceConfig.properties';
 var nodePropPlugin = require('./properties-node/node-properties-plugin.js');
 
-fs.readFile(STATIC_RESOURCE_CONFIG_FILE,"utf8",(err,data) => {
-    if(err)throw err;
-    // console.log(data);
-    // console.log(nodePropPlugin.toJson);
-    nodePropPlugin.toJson(data);
-});
+// fs.readFile(STATIC_RESOURCE_CONFIG_FILE,"utf8",(err,data) => {
+//     if(err)throw err;
+//     // console.log(data);
+//     // console.log(nodePropPlugin.toJson);
+//     nodePropPlugin.toJson(data);
+// });
 
-var rl = readline.createInterface({
-    input: fs.createReadStream(STATIC_RESOURCE_FILE),
-    output: process.stdout,
-    terminal: false
-});
-var  json = {};
-rl.on('line',function(line){
-    var  arr = line.split("=");
-    // console.log(arr);
-    json[arr[0]] = arr[1];
-}).on('close',function(line){
-    console.log(json);
-});
+// var rl = readline.createInterface({
+//     input: fs.createReadStream(STATIC_RESOURCE_FILE),
+//     output: process.stdout,
+//     terminal: false
+// });
+// var  json = {};
+// rl.on('line',function(line){
+//     var  arr = line.split("=");
+//     // console.log(arr);
+//     json[arr[0]] = arr[1];
+// }).on('close',function(line){
+//     console.log(json);
+// });
 
 // fs.readFile(STATIC_RESOURCE_CONFIG_FILE,"utf8",(err,data) => {
 //     if(err)throw err;
@@ -97,4 +97,4 @@ app.use(function *() {
   this.body = 'hello koa-middlewares';
 });
 // app.use(function *(){ console.log('http request is listening ' + PORT) });
-app.listen('3000');
+app.listen('3010');
