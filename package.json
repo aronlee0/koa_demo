@@ -1,21 +1,46 @@
 {
   "name": "koa_demo",
   "version": "1.0.0",
-  "description": "",
+  "description": "a koa demo",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node index.js"
+    "dev": "NODE_ENV=dev ./node_modules/.bin/nodemon --use_strict ./index.js",
+    "test": "NODE_ENV=test ./node_modules/.bin/nodemon --use_strict ./index.js",
+    "beta": "NODE_ENV=beta ./node_modules/.bin/nodemon --use_strict ./index.js",
+    "prod": "NODE_ENV=prod ./node_modules/.bin/nodemon --use_strict ./index.js"
   },
-  "author": "",
+  "author": "Aron_Lee",
   "license": "ISC",
   "dependencies": {
+    "koa": "^2.0.0",
+    "nodemon": "^1.11.0",
+    "shelljs": "^0.7.5",
+    "winston": "^2.3.0"
+  },
+  "devDependencies": {
+    "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-plugin-transform-async-to-generator": "^6.16.0",
     "babel-preset-es2015-node5": "^1.2.0",
     "babel-preset-stage-0": "^6.16.0",
-    "babel-register": "^6.18.0",
-    "koa": "^1.2.4",
-    "nodemon": "^1.11.0"
-  }
+    "babel-register": "^6.18.0"
+  },
+  "bin": {
+    "koa_demo": "app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lxlzq11/koa_demo.git"
+  },
+  "keywords": [
+    "koa",
+    "demo",
+    "properties",
+    "file",
+    "handling"
+  ],
+  "bugs": {
+    "url": "https://github.com/lxlzq11/koa_demo/issues"
+  },
+  "homepage": "https://github.com/lxlzq11/koa_demo#readme"
 }
