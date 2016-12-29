@@ -201,10 +201,16 @@ export function startLoadProperties(){
     //初始化静态目录
     if(!fs.existsSync(C_W_D + STATIC_PATH)){
         let a = STATIC_PATH.replace(/(^\/)|(\/$)/g,"").split("/");
-        
-        fs.mkdirSync(STATIC_PATH.replace(/(^\/)|(\/$)/g,""));
+        if(a.length === 1){
+            fs.mkdirSync(a[0]);
+        }else{
+            let str = a[0];
+            for(let i = 0; i < a.length; i++){
+                fs.mkdirSync(str);
+                str = str + '/' + a[ i + 1];
+            }
+        }
     }
-   
     // 开发环境使用本地静态文件
     if (NODE_ENV !== "dev") {
         // 每一分钟定时装载staticResourceConfig任务
