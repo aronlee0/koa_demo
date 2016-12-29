@@ -12,6 +12,8 @@
   "author": "Aron_Lee",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.15.3",
+    "fs-extra": "^1.0.0",
     "koa": "^2.0.0",
     "lodash": "^4.17.3",
     "nodemon": "^1.11.0",

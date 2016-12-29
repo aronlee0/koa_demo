@@ -1,9 +1,12 @@
-import fs from "fs";
+// import fs from "fs";
 import readline from "readline";
 import http from "http";
-
-import crypto from "fs";
+import axios from "axios";
+import fs from "fs-extra";
+import crypto from "crypto";
 import _ from "lodash";
+
+// import {propFileToJsonFile} from "./properties-to-json";
 
 const C_W_D = process.cwd();
 const NODE_ENV = process.env['NODE_ENV'].toLowerCase() || "dev";
@@ -12,6 +15,7 @@ const config = require(C_W_D + '/config/conf')(NODE_ENV);
 const ANNOTATION_G_RE = /\s*#[^\n]*/g;
 const SPACE_H_OR_F_RE = /(^\s)|(\s$)/g;
 const END_OF_EACH_LINE_RE = /(\S)[\s]*\n[\s]*(\S)/g;
+const PROP_TO_MAP_RE = /(\s*#[^\n]*)|((^\s)|(\s$))/g;
 
 const CONFIG_NAME = "staticConfig.properties";
 const STATIC_RESOURCE_NAME = "staticResource.properties";
@@ -19,7 +23,7 @@ const STATIC_CONFIG_NAME = "staticResourceConfig.properties";
 const STATIC_PATH = "/assets/resource/";
 
 class PropertiesUtil{
-    custructor(){
+    constructor(){
         this.isAutoReloadStaticResource = false;
         this.staticResourceConfigURL = "";
         this.staticResourceURL = "";
@@ -27,12 +31,9 @@ class PropertiesUtil{
         this.staticResourceMD5 = "";
         this.staticResourceJSON = {};
         this.__TIMER = {};
-        if(fs.existsSync(this.getLocalUrl(STATIC_RESOURCE_NAME))){
-            this.staticResourceJSON = this.loadLocalPropertiesToJson(this.getLocalUrl(STATIC_RESOURCE_NAME));
-        }
-    }
-    getLocalUrl(fileName){
-        return C_W_D + STATIC_PATH + fileName;
+        let localProp = this.getLocalUrl(STATIC_RESOURCE_NAME);
+        fs.ensureFileSync(localProp);
+        this.staticResourceJSON = this.loadLocalPropertiesToJson(localProp);
     }
     getLocalUrl(fileName){
         return C_W_D + STATIC_PATH + fileName;
@@ -63,51 +64,34 @@ class PropertiesUtil{
     }
     loadStaticResource(){
         let self = this;
+        // propFileToJsonFile(self.getLocalUrl(STATIC_RESOURCE_NAME));
         if(!self.isAutoReloadStaticResource && !self.isEmptyObj(this.staticResourceJSON)){
             console.log("load file " + STATIC_RESOURCE_NAME + " suspended.");
             return;
         }
         let localPath = self.getLocalUrl(STATIC_RESOURCE_NAME);
+        // let md5 = self.getMD5(localPath);
         if(self.isAutoReloadStaticResource || !fs.existsSync(localPath)){
             self.downloadToLocal(self.staticResourceURL,localPath).then(()=>{
                 this.staticResourceJSON = self.loadLocalPropertiesToJson(localPath);
                 console.log("load file " + STATIC_RESOURCE_NAME + " finish.");
             });
         }
-        // getMD5(localPath).then((md5)=>{
-        //     console.log(md5);
-        // });
+        
     }
     getMD5(url){
-        return new Promise((resolve,reject) => {
-            if(!fs.existsSync(url)){
-                reject();
-                throw new Error("got md5 fail: file is not exists");
-            }
-            var rs = fs.ReadStream(url);
-            var hash = crypto.createHash("md5");
-            let data = "";
-            let str = "";
-            rs.on('data',(d)=>{
-                data += d;
-            });
-            rs.on('end',()=>{
-                str = data.replace(ANNOTATION_G_RE,"").replace(SPACE_H_OR_F_RE,"").replace(END_OF_EACH_LINE_RE,"$1, $2");
-                str = "{" + str + "}";
-                fs.writeFileSync("./test.txt",str,"utf8",(err)=>{
-                    if(err)throw new Error(err);
-                    console.log('write test.txt finish');
-                });
-                // console.log(str);
-                hash.update(str);
-                let md5 = hash.digest('hex');
-                resolve(md5);
-            });
-            rs.on('error',(e)=>{
-                reject();
-                throw new Error(e);
-            })
-        });
+        if(!fs.existsSync(url)){
+            reject();
+            throw new Error("got md5 fail: file is not exists");
+            return "";
+        }
+        var rfs = fs.readFileSync(url,'utf8');
+        let str = rfs.replace(ANNOTATION_G_RE,"").trim().replace(END_OF_EACH_LINE_RE,"$1, $2");
+        str = "{" + str + "}";
+        var hash = crypto.createHash("md5");
+        hash.update(str);
+        let md5 = hash.digest('hex');
+        return md5;
     }
     getHttpFile(url){
         if(!url){
@@ -137,18 +121,14 @@ class PropertiesUtil{
     downloadToLocal(url, local){
         let self = this;
         return new Promise((resolve,reject)=>{
-            self.getHttpFile(url).then((data) => {
-                fs.writeFile(local,data,'utf-8',(err) => {
-                    if(err) {
-                        reject(err);
-                    }else{
-                        resolve(data);
-                        // console.log(' "' + url + '"' + ' has saved to " ' + local + '!"');
-                    }
-                });
+            axios.get(url).then((response)=>{
+                fs.outputFileSync(local,response.data);
+                resolve(response.data);
+            }).catch((err)=>{
+                console.log(err);
+                reject(err);
             });
         });
-        
     }
     loadLocalPropertiesToJson (path){
         let jsonObj = {};
@@ -180,6 +160,7 @@ class PropertiesUtil{
         }
 
         //初始化静态目录
+
         if(!fs.existsSync(C_W_D + STATIC_PATH)){
             let a = STATIC_PATH.replace(/(^\/)|(\/$)/g,"").split("/");
             if(a.length === 1){
