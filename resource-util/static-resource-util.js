@@ -1,12 +1,10 @@
 // import fs from "fs";
 import readline from "readline";
-import http from "http";
 import axios from "axios";
 import fs from "fs-extra";
 import crypto from "crypto";
 import _ from "lodash";
-
-// import {propFileToJsonFile} from "./properties-to-json";
+import {propFileToJsonSync} from "./properties-to-json";
 
 const C_W_D = process.cwd();
 const NODE_ENV = process.env['NODE_ENV'].toLowerCase() || "dev";
@@ -22,7 +20,18 @@ const STATIC_RESOURCE_NAME = "staticResource.properties";
 const STATIC_CONFIG_NAME = "staticResourceConfig.properties";
 const STATIC_PATH = "/assets/resource/";
 
+/**
+ * 
+ * 
+ * @class PropertiesUtil
+ */
 class PropertiesUtil{
+    /**
+     * Creates an instance of PropertiesUtil.
+     * 
+     * 
+     * @memberOf PropertiesUtil
+     */
     constructor(){
         this.isAutoReloadStaticResource = false;
         this.staticResourceConfigURL = "";
@@ -33,25 +42,63 @@ class PropertiesUtil{
         this.__TIMER = {};
         let localProp = this.getLocalUrl(STATIC_RESOURCE_NAME);
         fs.ensureFileSync(localProp);
-        this.staticResourceJSON = this.loadLocalPropertiesToJson(localProp);
+        this.staticResourceJSON = propFileToJsonSync(localProp);
     }
+    /**
+     * 
+     * 
+     * @param {any} fileName
+     * @returns string
+     * 
+     * @memberOf PropertiesUtil
+     */
     getLocalUrl(fileName){
         return C_W_D + STATIC_PATH + fileName;
     }
+    /**
+     * 
+     * 
+     * @param {any} str
+     * @returns
+     * 
+     * @memberOf PropertiesUtil
+     */
     parseBool(str){
         return typeof str === "string" && str.toLowerCase() === "true";
     }
+    /**
+     * 
+     * 
+     * @param {any} str
+     * @returns
+     * 
+     * @memberOf PropertiesUtil
+     */
     isEmpty(str){
         return !str || (typeof str === 'string' && !str.trim());
     }
+    /**
+     * 
+     * 
+     * @param {any} obj
+     * @returns
+     * 
+     * @memberOf PropertiesUtil
+     */
     isEmptyObj(obj){
         return typeof obj === "object" && _.isEmpty(obj);
     }
+    /**
+     * 
+     * 
+     * 
+     * @memberOf PropertiesUtil
+     */
     loadStaticResourceConfig(){
         let self = this;
         let localPh = self.getLocalUrl(STATIC_CONFIG_NAME);
         self.downloadToLocal(self.staticResourceConfigURL,localPh).then(()=>{
-            let newJson = self.loadLocalPropertiesToJson(localPh);
+            let newJson = propFileToJsonSync(localPh);
             self.tmpStaticResourceMD5 = newJson["staticResourceMD5"];
             self.isAutoReloadStaticResource = self.parseBool(newJson["autoReload"]);
             // if(!isEmpty(self.staticResourceMD5) && self.staticResourceMD5 === self.tmpStaticResourceMD5){
@@ -62,9 +109,15 @@ class PropertiesUtil{
             console.log(err) ;
         });
     }
+    /**
+     * 
+     * 
+     * @returns
+     * 
+     * @memberOf PropertiesUtil
+     */
     loadStaticResource(){
         let self = this;
-        // propFileToJsonFile(self.getLocalUrl(STATIC_RESOURCE_NAME));
         if(!self.isAutoReloadStaticResource && !self.isEmptyObj(this.staticResourceJSON)){
             console.log("load file " + STATIC_RESOURCE_NAME + " suspended.");
             return;
@@ -73,12 +126,20 @@ class PropertiesUtil{
         // let md5 = self.getMD5(localPath);
         if(self.isAutoReloadStaticResource || !fs.existsSync(localPath)){
             self.downloadToLocal(self.staticResourceURL,localPath).then(()=>{
-                this.staticResourceJSON = self.loadLocalPropertiesToJson(localPath);
+                this.staticResourceJSON = propFileToJsonSync(localPath);
                 console.log("load file " + STATIC_RESOURCE_NAME + " finish.");
             });
         }
         
     }
+    /**
+     * 
+     * 
+     * @param {any} url
+     * @returns
+     * 
+     * @memberOf PropertiesUtil
+     */
     getMD5(url){
         if(!fs.existsSync(url)){
             reject();
@@ -93,30 +154,14 @@ class PropertiesUtil{
         let md5 = hash.digest('hex');
         return md5;
     }
-    getHttpFile(url){
-        if(!url){
-            throw new Error('remote properties url is wrong');
-        }
-        return new Promise((resolve,reject)=>{
-            http.get(url,(res) => {
-                var  data = "";
-                res.on('data',function(d){
-                    data += d;
-                });
-                res.on("end", function(d) {
-                    resolve(data);
-                });
-            }).on('error', (e) => {
-                throw new Error(e);
-                reject(e);
-            });
-        });
-    }
     /**
-     * 下载文件至本地
      * 
-     * @param 远程url
-     * @param 本地路径
+     * 
+     * @param {any} 远程url
+     * @param {any} 本地路径
+     * @returns
+     * 
+     * @memberOf PropertiesUtil
      */
     downloadToLocal(url, local){
         let self = this;
@@ -130,21 +175,13 @@ class PropertiesUtil{
             });
         });
     }
-    loadLocalPropertiesToJson (path){
-        let jsonObj = {};
-        if(!fs.existsSync(path))return jsonObj;
-        let str = fs.readFileSync(path,'utf8');
-        str = str.replace(ANNOTATION_G_RE,"").split("\n");
-        str.forEach(function(e) {
-            let arr;
-            e = e.trim();
-            if(e){
-                arr = e.split("=");
-                jsonObj[arr[0]] = arr[1];
-            }
-        });
-        return jsonObj;
-    }
+    
+    /**
+     * 
+     * @description start load properties files
+     * 
+     * @memberOf PropertiesUtil
+     */
     startLoadProperties(){
         let self = this;
         let staticConfigs = config.staticConfigs;
@@ -160,24 +197,17 @@ class PropertiesUtil{
         }
 
         //初始化静态目录
-
-        if(!fs.existsSync(C_W_D + STATIC_PATH)){
-            let a = STATIC_PATH.replace(/(^\/)|(\/$)/g,"").split("/");
-            if(a.length === 1){
-                fs.mkdirSync(a[0]);
-            }else{
-                let str = a[0];
-                for(let i = 0; i < a.length; i++){
-                    fs.mkdirSync(str);
-                    str = str + '/' + a[ i + 1];
-                }
-            }
-        }
+        fs.ensureDir("."+STATIC_PATH,(err)=>{
+            if(err)console.log(err);
+        });
         // 开发环境使用本地静态文件
         if (NODE_ENV !== "dev") {
             // 每一分钟定时装载staticResourceConfig任务
             self.loadStaticResourceConfig();
             self.loadStaticResource();
+            /**
+             * 
+             */
             function setTimeLoad(){
                 self.__TIMER = setTimeout(() => {
                     self.loadStaticResourceConfig();
@@ -188,6 +218,14 @@ class PropertiesUtil{
             setTimeLoad();
         }
     }
+    /**
+     * 
+     * 
+     * @param {any} key
+     * @returns the key's value(url)
+     * 
+     * @memberOf PropertiesUtil
+     */
     getURL(key){
         if(this.isEmptyObj(this.staticResourceJSON))return;
         if(!key)return "";

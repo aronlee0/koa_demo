@@ -1,8 +1,13 @@
 import fs from "fs-extra";
 import _ from "lodash";
-//去除注释
 const ANNOTATION_G_RE = /\s*#[^\n]*/g;
-
+/**
+ * 
+ * 
+ * @export
+ * @param {any} str
+ * @returns {JSON}
+ */
 export function propToJson(str){
     let jsonObj = {};
     str = str.replace(ANNOTATION_G_RE,"").split("\n");
@@ -16,6 +21,13 @@ export function propToJson(str){
     });
     return jsonObj;
 }
+/**
+ * 
+ * @description properties file to JSON object
+ * @export
+ * @param {any} path
+ * @returns
+ */
 export function propFileToJson(path){
     return new Promise((resolve,reject) => {
         if(!fs.existsSync(path)){
@@ -28,11 +40,26 @@ export function propFileToJson(path){
         })
     });
 }
+/**
+ * 
+ * @description  properties file to JSON object (sync)
+ * @export
+ * @param {any} path
+ * @returns
+ */
 export function propFileToJsonSync(path){
     let jsonObj = {};
     if(!fs.existsSync(path))return jsonObj;
     return propToJson(fs.readFileSync(path,'utf8'));
 }
+/**
+ * 
+ * @description  properties file to JSON file
+ * @export
+ * @param {any} src
+ * @param {any} dst
+ * @returns
+ */
 export function propFileToJsonFile(src,dst){
     return new Promise((resolve,reject) => {
         if(_.isEmpty(dst)){
@@ -49,6 +76,13 @@ export function propFileToJsonFile(src,dst){
     });
     
 }
+/**
+ * 
+ * @description  properties file to JSON file (sync);
+ * @export
+ * @param {any} src
+ * @param {any} dst
+ */
 export function propFileToJsonFileSync(src,dst){
     if(_.isEmpty(dst))throw new Error("The directory where json is output is null");
     let json = JSON.stringify(propFileToJson(src));
