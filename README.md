@@ -3,9 +3,9 @@
 这是一个koa 示例，这是参照[koa-rudy](https://github.com/iwfe/koa-rudy)项目开发的。主要架构和思路参照该项目文档，这里我只是介绍下我增加的部分；
 
 ## 目录
-|- resource-util
-|- |- properties-to-json properties文件转成json格式的几个方法
-|- |- static-resource-util	远程拉取properties文件的处理层
+|- resource-util    
+|- |- properties-to-json properties文件转成json格式的几个方法  
+|- |- static-resource-util	远程拉取properties文件的处理层    
 
 ### resource-util
 这是根据之前java项目处理前端静态资源加载的改写的node版本。主要的方式和逻辑跟之前一致
