@@ -100,9 +100,9 @@ class PropertiesUtil{
             let newJson = propFileToJsonSync(localPh);
             self.tmpStaticResourceMD5 = newJson["staticResourceMD5"];
             self.isAutoReloadStaticResource = self.parseBool(newJson["autoReload"]);
-            // if(!isEmpty(self.staticResourceMD5) && self.staticResourceMD5 === self.tmpStaticResourceMD5){
-            //     self.isAutoReloadStaticResource = false;
-            // }
+            if(!self.isEmpty(self.staticResourceMD5) && self.staticResourceMD5 === self.tmpStaticResourceMD5){
+                self.isAutoReloadStaticResource = false;
+            }
             console.log("load file " + STATIC_CONFIG_NAME + " finish.");
         }).catch((err)=>{
             console.log(err) ;
@@ -122,14 +122,18 @@ class PropertiesUtil{
             return;
         }
         let localPath = self.getLocalUrl(STATIC_RESOURCE_NAME);
-        // let md5 = self.getMD5(localPath);
+        
         if(self.isAutoReloadStaticResource || !fs.existsSync(localPath)){
             self.downloadToLocal(self.staticResourceURL,localPath).then(()=>{
                 this.staticResourceJSON = propFileToJsonSync(localPath);
                 console.log("load file " + STATIC_RESOURCE_NAME + " finish.");
             });
         }
-        
+        let md5 = self.getMD5(localPath);
+        if(!self.isEmpty(self.tmpStaticResourceMD5) && md5 !== self.tmpStaticResourceMD5){
+            return;
+        }
+        self.staticResourceMD5 = self.tmpStaticResourceMD5;
     }
     /**
      * 
