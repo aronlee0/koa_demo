@@ -13,7 +13,6 @@ const config = require(C_W_D + '/config/conf')(NODE_ENV);
 const ANNOTATION_G_RE = /\s*#[^\n]*/g;
 const SPACE_H_OR_F_RE = /(^\s)|(\s$)/g;
 const END_OF_EACH_LINE_RE = /(\S)[\s]*\n[\s]*(\S)/g;
-const PROP_TO_MAP_RE = /(\s*#[^\n]*)|((^\s)|(\s$))/g;
 
 const CONFIG_NAME = "staticConfig.properties";
 const STATIC_RESOURCE_NAME = "staticResource.properties";
@@ -46,7 +45,7 @@ class PropertiesUtil{
     }
     /**
      * 
-     * 
+     * 根据文件名获取完整本地路径
      * @param {any} fileName
      * @returns string
      * 
@@ -57,18 +56,18 @@ class PropertiesUtil{
     }
     /**
      * 
-     * 
+     * string转换成bool类型
      * @param {any} str
      * @returns
      * 
      * @memberOf PropertiesUtil
      */
     parseBool(str){
-        return typeof str === "string" && str.toLowerCase() === "true";
+        return typeof str ==="boolean" ? str : (typeof str === "string" && str.toLowerCase() === "true");
     }
     /**
      * 
-     * 
+     * 判断字符串为空
      * @param {any} str
      * @returns
      * 
@@ -79,7 +78,7 @@ class PropertiesUtil{
     }
     /**
      * 
-     * 
+     * 判断空对象
      * @param {any} obj
      * @returns
      * 
@@ -90,7 +89,7 @@ class PropertiesUtil{
     }
     /**
      * 
-     * 
+     * 加载staticResourceConfig.properties文件
      * 
      * @memberOf PropertiesUtil
      */
@@ -111,7 +110,7 @@ class PropertiesUtil{
     }
     /**
      * 
-     * 
+     * 加载staticResource.properties文件
      * @returns
      * 
      * @memberOf PropertiesUtil
@@ -134,7 +133,7 @@ class PropertiesUtil{
     }
     /**
      * 
-     * 
+     * 获取url对应文件的md5
      * @param {any} url
      * @returns
      * 
@@ -156,7 +155,7 @@ class PropertiesUtil{
     }
     /**
      * 
-     * 
+     * 加载远程文件到本地
      * @param {any} 远程url
      * @param {any} 本地路径
      * @returns
@@ -177,7 +176,7 @@ class PropertiesUtil{
     }
     
     /**
-     * 
+     * 开始开启properties文件处理逻辑
      * @description start load properties files
      * 
      * @memberOf PropertiesUtil
@@ -220,7 +219,7 @@ class PropertiesUtil{
     }
     /**
      * 
-     * 
+     * 根据properties中的key获取value，也就是完整路径
      * @param {any} key
      * @returns the key's value(url)
      * 
