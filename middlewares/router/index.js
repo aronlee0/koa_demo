@@ -1,3 +1,5 @@
-export default async (ctx,next) => { 
+export default ()=>{
+    return async (ctx,next) => {
 
+    }
 }
