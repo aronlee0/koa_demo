@@ -11,6 +11,7 @@ module.exports = {
      */
     staticConfigs:{
         staticResourceConfigURL: 'http://house-test-water.oss.aliyuncs.com/resource/iwjw-pc_test/staticResourceConfig.properties',
-        staticResourceURL:'http://house-test-water.oss.aliyuncs.com/resource/iwjw-pc_test/staticResource.properties'
+        // staticResourceURL:'http://house-test-water.oss.aliyuncs.com/resource/iwjw-pc_test/staticResource.properties'
+        staticResourceURL:'http://10.7.248.103:8888/fe-boilerplate/'
     }
 }
